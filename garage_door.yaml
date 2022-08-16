@@ -10,7 +10,7 @@ switch:
   - platform: gpio
     pin: GPIO12
     id: relay_1
-    name: garage_door_opener_switch
+    name: "Garage | Door opener switch"
     icon: "mdi:garage"
     on_turn_on:
       then:
