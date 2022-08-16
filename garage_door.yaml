@@ -1,0 +1,33 @@
+<<: !include ./includes/secrets.yaml
+<<: !include ./includes/common.yaml
+
+esphome:
+  name: garage_door
+  platform: ESP8266
+  board: esp8285
+
+switch:
+  - platform: gpio
+    pin: GPIO12
+    id: relay_1
+    name: garage_door_opener_switch
+    icon: "mdi:garage"
+    on_turn_on:
+      then:
+        - delay: 500ms
+        - switch.turn_off: relay_1
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: true
+    id: binary_sensor_1
+    on_press:
+      - switch.turn_on: relay_1
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: yes

@@ -1,0 +1,82 @@
+<<: !include ./includes/secrets.yaml
+<<: !include ./includes/common.yaml
+
+esphome:
+  name: hot_tub
+  platform: ESP8266
+  board: esp01_1m
+
+binary_sensor:
+  - platform: gpio
+    id: relay1_button
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: true
+    on_press:
+      - switch.toggle: relay1
+  - platform: gpio
+    id: relay2_button
+    pin:
+      number: GPIO9
+      mode: INPUT_PULLUP
+      inverted: true
+    on_press:
+      - switch.toggle: relay2
+  - platform: gpio
+    id: relay3_button
+    pin:
+      number: GPIO10
+      mode: INPUT_PULLUP
+      inverted: true
+    filters:
+      - delayed_off: 10s
+    on_press:
+      - switch.turn_off: relay3
+    on_release:
+      - switch.turn_on: relay3
+
+output:
+  - platform: gpio
+    pin: GPIO2
+    id: relay1_status
+
+switch:
+  - platform: gpio
+    name: "Blower"
+    icon: mdi:chart-bubble
+    pin: GPIO12
+    id: relay1
+    on_turn_on:
+      - output.turn_on: relay1_status
+      - delay: 3min
+      - switch.turn_off: relay1
+    on_turn_off:
+      - output.turn_off: relay1_status
+  - platform: gpio
+    name: "Lights"
+    icon: mdi:wall-sconce-round-variant
+    pin: GPIO5
+    id: relay2
+  - platform: gpio
+    name: "Flow alarm"
+    icon: mdi:alarm-light
+    pin: GPIO4
+    id: relay3
+    restore_mode: RESTORE_DEFAULT_ON
+  - platform: gpio
+    name: "Spare"
+    pin: GPIO15
+
+dallas:
+  - pin: GPIO3
+
+sensor:
+  - platform: dallas
+    index: 0
+    name: "Water temperature"
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: yes
