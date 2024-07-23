@@ -1,0 +1,19 @@
+<<: !include ./includes/secrets.yaml
+<<: !include ./includes/common.yaml
+
+esphome:
+  name: outside_gate
+  platform: ESP8266
+  board: esp8285
+
+switch:
+  - platform: gpio
+    pin: GPIO14
+    id: relay_1
+    name: "Outside | Gate"
+    icon: "mdi:gate"
+    inverted: true
+    on_turn_on:
+      then:
+        - delay: 1500ms
+        - switch.turn_off: relay_1
