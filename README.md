@@ -30,5 +30,5 @@ Edit the `SSID` and `PASSWORD` for your wifi network.
 ## Flash / update a board
 
 ```
-esphome <config.yaml> run
+esphome run <config.yaml>
 ```

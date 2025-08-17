@@ -3,80 +3,85 @@
 
 esphome:
   name: hot_tub
-  platform: ESP8266
-  board: esp01_1m
 
-binary_sensor:
-  - platform: gpio
-    id: relay1_button
-    pin:
-      number: GPIO0
-      mode: INPUT_PULLUP
-      inverted: true
-    on_press:
-      - switch.toggle: relay1
-  - platform: gpio
-    id: relay2_button
-    pin:
-      number: GPIO9
-      mode: INPUT_PULLUP
-      inverted: true
-    on_press:
-      - switch.toggle: relay2
-  - platform: gpio
-    id: relay3_button
-    pin:
-      number: GPIO10
-      mode: INPUT_PULLUP
-      inverted: true
-    filters:
-      - delayed_off: 10s
-    on_press:
-      - switch.turn_off: relay3
-    on_release:
-      - switch.turn_on: relay3
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
 
-output:
-  - platform: gpio
-    pin: GPIO2
-    id: relay1_status
+i2c:
+  sda: GPIO4
+  scl:
+    number: GPIO15
+    ignore_strapping_warning: true
+
+pcf8574:
+  - id: inputs
+    address: 0x22
+  - id: outputs
+    address: 0x24
 
 switch:
   - platform: gpio
+    id: relay_1
     name: "Blower"
     icon: mdi:chart-bubble
-    pin: GPIO12
-    id: relay1
+    pin:
+      pcf8574: outputs
+      number: 0
+      mode: OUTPUT
+      inverted: true
     on_turn_on:
-      - output.turn_on: relay1_status
+#      - output.turn_on: relay1_status
       - delay: 3min
-      - switch.turn_off: relay1
-    on_turn_off:
-      - output.turn_off: relay1_status
+      - switch.turn_off: relay_1
+#    on_turn_off:
+#      - output.turn_off: relay1_status
   - platform: gpio
     name: "Lights"
     icon: mdi:wall-sconce-round-variant
-    pin: GPIO5
-    id: relay2
+    pin:
+      pcf8574: outputs
+      number: 1
+      mode: OUTPUT
+      inverted: true
   - platform: gpio
-    name: "Flow alarm"
-    icon: mdi:alarm-light
-    pin: GPIO4
-    id: relay3
+    name: "Filter pump"
+    icon: mdi:pump
+    pin:
+      pcf8574: outputs
+      number: 2
+      mode: OUTPUT
+      inverted: true
     restore_mode: RESTORE_DEFAULT_ON
   - platform: gpio
-    name: "Spare"
-    pin: GPIO15
+    name: "LED strips"
+    icon: mdi:led-strip
+    pin:
+      pcf8574: outputs
+      number: 3
+      mode: OUTPUT
+      inverted: true
+  - platform: gpio
+    name: "Spare 1"
+    pin:
+      pcf8574: outputs
+      number: 4
+      mode: OUTPUT
+      inverted: true
+  - platform: gpio
+    name: "Spare 2"
+    pin:
+      pcf8574: outputs
+      number: 5
+      mode: OUTPUT
+      inverted: true
 
-dallas:
-  - pin: GPIO3
-
-sensor:
-  - platform: dallas
-    index: 0
-    name: "Water temperature"
-
-status_led:
-  pin:
-    number: GPIO13
-    inverted: yes
+#dallas:
+#  - pin: GPIO3
+#
+#sensor:
+#  - platform: dallas
+#    index: 0
+#    name: "Water temperature"
+#
