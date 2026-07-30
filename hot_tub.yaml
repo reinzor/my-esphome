@@ -23,65 +23,48 @@ pcf8574:
 
 switch:
   - platform: gpio
-    id: relay_1
-    name: "Blower"
-    icon: mdi:chart-bubble
-    pin:
-      pcf8574: outputs
-      number: 0
-      mode: OUTPUT
-      inverted: true
-    on_turn_on:
-#      - output.turn_on: relay1_status
-      - delay: 3min
-      - switch.turn_off: relay_1
-#    on_turn_off:
-#      - output.turn_off: relay1_status
-  - platform: gpio
-    name: "Lights"
-    icon: mdi:wall-sconce-round-variant
+    id: relay_2
+    name: "Filter pump"
+    icon: mdi:pump
     pin:
       pcf8574: outputs
       number: 1
       mode: OUTPUT
       inverted: true
   - platform: gpio
-    name: "Filter pump"
-    icon: mdi:pump
+    id: relay_3
+    name: "Blower"
+    icon: mdi:chart-bubble
     pin:
       pcf8574: outputs
       number: 2
       mode: OUTPUT
       inverted: true
-    restore_mode: RESTORE_DEFAULT_ON
+    on_turn_on:
+      - delay: 3min
+      - switch.turn_off: relay_3
   - platform: gpio
-    name: "LED strips"
-    icon: mdi:led-strip
+    id: relay_4
+    name: "Flow alarm"
+    icon: mdi:alarm-light
     pin:
       pcf8574: outputs
       number: 3
       mode: OUTPUT
       inverted: true
   - platform: gpio
-    name: "Spare 1"
+    name: "LED strips"
+    icon: mdi:led-strip
     pin:
       pcf8574: outputs
       number: 4
       mode: OUTPUT
       inverted: true
   - platform: gpio
-    name: "Spare 2"
+    name: "Lights"
+    icon: mdi:wall-sconce-round-variant
     pin:
       pcf8574: outputs
       number: 5
       mode: OUTPUT
       inverted: true
-
-#dallas:
-#  - pin: GPIO3
-#
-#sensor:
-#  - platform: dallas
-#    index: 0
-#    name: "Water temperature"
-#
