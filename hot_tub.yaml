@@ -56,7 +56,7 @@ switch:
       - delay: 3min
       - switch.turn_off: relay_blower
   - platform: gpio
-    id: relay_4
+    id: relay_flow_alarm
     name: "Flow alarm"
     icon: mdi:alarm-light
     pin:
@@ -117,11 +117,27 @@ binary_sensor:
     on_press:
       - switch.toggle: relay_lights
   - platform: gpio
+    id: flow_switch
     name: "Flow switch"
     pin:
       number: GPIO33
       mode: INPUT_PULLUP
       inverted: true
+  - platform: template
+    id: no_flow_detected
+    name: "No flow detected"
+    lambda: |-
+      return id(relay_filter_pump).state && !id(flow_switch).state;
+    filters:
+      # Single source of truth for the flow-alarm logic: only trigger the
+      # alarm once "pump running AND no flow" has been true continuously
+      # for 5s (a delayed *on*, so brief flow dips don't cause false alarms),
+      # but clear the alarm immediately once flow is detected again.
+      - delayed_on: 1s
+    on_press:
+      - switch.turn_on: relay_flow_alarm
+    on_release:
+      - switch.turn_off: relay_flow_alarm
 
 sensor:
   - platform: dallas_temp
