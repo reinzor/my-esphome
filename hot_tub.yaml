@@ -3,6 +3,9 @@
 
 esphome:
   name: hot_tub
+  on_boot:
+    then:
+      - output.turn_on: led_status
 
 esp32:
   board: esp32dev
@@ -15,6 +18,15 @@ i2c:
     number: GPIO15
     ignore_strapping_warning: true
 
+one_wire:
+  - platform: gpio
+    pin: GPIO32
+
+output:
+  - platform: gpio
+    pin: GPIO25
+    id: led_status
+
 pcf8574:
   - id: inputs
     address: 0x22
@@ -23,7 +35,7 @@ pcf8574:
 
 switch:
   - platform: gpio
-    id: relay_2
+    id: relay_filter_pump
     name: "Filter pump"
     icon: mdi:pump
     pin:
@@ -32,7 +44,7 @@ switch:
       mode: OUTPUT
       inverted: true
   - platform: gpio
-    id: relay_3
+    id: relay_blower
     name: "Blower"
     icon: mdi:chart-bubble
     pin:
@@ -42,7 +54,7 @@ switch:
       inverted: true
     on_turn_on:
       - delay: 3min
-      - switch.turn_off: relay_3
+      - switch.turn_off: relay_blower
   - platform: gpio
     id: relay_4
     name: "Flow alarm"
@@ -61,6 +73,7 @@ switch:
       mode: OUTPUT
       inverted: true
   - platform: gpio
+    id: relay_lights
     name: "Lights"
     icon: mdi:wall-sconce-round-variant
     pin:
@@ -68,3 +81,49 @@ switch:
       number: 5
       mode: OUTPUT
       inverted: true
+
+binary_sensor:
+  - platform: gpio
+    name: "Filter pump button"
+    pin:
+      pcf8574: inputs
+      number: 0
+      mode: INPUT
+      inverted: true
+    filters:
+      - delayed_on: 50ms
+    on_press:
+      - switch.toggle: relay_filter_pump
+  - platform: gpio
+    name: "Blower button"
+    pin:
+      pcf8574: inputs
+      number: 1
+      mode: INPUT
+      inverted: true
+    filters:
+      - delayed_on: 50ms
+    on_press:
+      - switch.toggle: relay_blower
+  - platform: gpio
+    name: "Lights button"
+    pin:
+      pcf8574: inputs
+      number: 2
+      mode: INPUT
+      inverted: true
+    filters:
+      - delayed_on: 50ms
+    on_press:
+      - switch.toggle: relay_lights
+  - platform: gpio
+    name: "Flow switch"
+    pin:
+      number: GPIO33
+      mode: INPUT_PULLUP
+      inverted: true
+
+sensor:
+  - platform: dallas_temp
+    name: "Temperature"
+    update_interval: 30s
